@@ -2,6 +2,7 @@
 
 from collections import Counter
 from exceptions import *
+from docx import *
 import re
 import sys
 import os
@@ -24,32 +25,40 @@ class FileParser(object):
 	def parse(self):
 		for file in self.files:		
 			if os.path.isfile(file):
-				try:
-					word_count = 0
-					line_count = 0
-					words = []
-					with open(file, 'r') as f:
-						lines = f.readlines()
-						for line in lines:
-							words += line.split()
-							word_count += len(words)
-							line_count += 1
-					with open(str(self._output), 'w') as out:
-						frequent_wrds = []
-						for tple in frequent(words, 5):
-							print tple
-							frequent_wrds.append(tple[0])
-						frequent_wrds = ' '.join(frequent_wrds)
-						print frequent_wrds
+				frequent_wrds = []
+				word_count = 0
+				line_count = 0
+				words = []
 
-						out.write('File name: {0} \n'.format(file))
-						out.write('Word count: {0} \n'.format(word_count))
-						out.write('Line count: {0} \n'.format(line_count))
-						out.write('Most Frequent: {0}\n'.format(frequent_wrds))
+				if 'txt' in file[file.find('.'):]:				
+					try:
+						with open(file, 'r') as f:
+							lines = f.readlines()
+							for line in lines:
+								words += line.split()
+								word_count += len(words)
+								line_count += 1
+					except Exception as ex:
+						pass
+				# Word doc
+				elif 'doc' in file[file.find('.'):]:
+					document = opendocx(file)
+					doc_text = getdocumenttext(document)
+					for line in doc_text:
+						words += line.split()
+						line_count += 1
+					word_count = len(words)
 
-						#f.write('Frequent words: %s') % (file.frequent)
-				except Exception as ex:
-					print str(ex)
+				with open(str(self._output), 'a+') as out:
+					for tple in frequent(words, 5):
+						frequent_wrds.append(tple[0])
+					frequent_wrds = ' '.join(frequent_wrds)
+					out.write('File name: {0} \n'.format(file))
+					out.write('Word count: {0} \n'.format(word_count))
+					out.write('Line count: {0} \n'.format(line_count))
+					out.write('Most Frequent: {0}\n'.format(frequent_wrds))
+					out.write('--------------------\n\n')
+
 
 def frequent(words, count=5):
 	c = Counter(words)
@@ -61,10 +70,8 @@ def main():
 		raise UsageException()
 
 	fileparser = FileParser(sys.argv[-1])
-	print 'output', sys.argv[-1]
 
 	for temp in sys.argv[1:-1]:
-		print temp
 		if os.path.isfile(temp):
 			fileparser.add_item(temp)
 	fileparser.parse()

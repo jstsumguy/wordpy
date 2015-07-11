@@ -1,4 +1,12 @@
+File name: resume_word.docx 
+Word count: 303 
+Line count: 38 
+Most Frequent: and a Javascript, Role: Python,
+--------------------
+
 File name: example.txt 
 Word count: 43 
 Line count: 4 
 Most Frequent: this is test another a
+--------------------
+
