@@ -1,17 +1,10 @@
 ''' Word runs multiple analytics on any number of files and outputs the results in a pretty table format '''
 
 from collections import Counter
+from exceptions import *
 import re
 import sys
 import os
-
-''' Exceptions '''
-class UsageException(Exception):
-	pass
-
-class FileNotFoundException(Exception):
-	pass
-
 
 class FileParser(object):
 
@@ -36,35 +29,31 @@ class FileParser(object):
 					line_count = 0
 					words = []
 					with open(file, 'r') as f:
-						spec = FileSpec(file)
 						lines = f.readlines()
 						for line in lines:
-							words = line.split()
+							words += line.split()
 							word_count += len(words)
 							line_count += 1
 					with open(str(self._output), 'w') as out:
+						frequent_wrds = []
+						for tple in frequent(words, 5):
+							print tple
+							frequent_wrds.append(tple[0])
+						frequent_wrds = ' '.join(frequent_wrds)
+						print frequent_wrds
+
 						out.write('File name: {0} \n'.format(file))
 						out.write('Word count: {0} \n'.format(word_count))
 						out.write('Line count: {0} \n'.format(line_count))
+						out.write('Most Frequent: {0}\n'.format(frequent_wrds))
 
 						#f.write('Frequent words: %s') % (file.frequent)
 				except Exception as ex:
 					print str(ex)
 
-class FileSpec(object):
-
-	def __init__(self, file):
-		self._file = file
-		self.word_count = 0
-		self.line_count = 0
-		self.words = []
-
-	def __str__(self):
-		return 'File {0}, word-count {1}, line-count {2}'.format(self._file, self.word_count, self.line_count)
-
-	def frequent(self, words=5):
-		# todo get most frequent words
-		pass
+def frequent(words, count=5):
+	c = Counter(words)
+	return c.most_common(count)
 
 
 def main():

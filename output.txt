@@ -1,3 +1,4 @@
 File name: example.txt 
-Word count: 18 
+Word count: 43 
 Line count: 4 
+Most Frequent: this is test another a
